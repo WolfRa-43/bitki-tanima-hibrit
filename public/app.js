@@ -51,8 +51,6 @@ analyzeBtn.addEventListener("click", async () => {
       return;
     }
 
-    const compressedBase64 = await compressImageToBase64(selectedFile, 1024, 0.75);
-
     result.textContent = "4/4 İnternet destekli kontrol yapılıyor...";
 
     const controller = new AbortController();
@@ -61,17 +59,13 @@ analyzeBtn.addEventListener("click", async () => {
     const apiResponse = await fetch("/api/identify", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": selectedFile.type || "image/jpeg",
+        "x-local-name": bestMatch.name,
+        "x-local-turkish": bestMatch.turkish,
+        "x-local-category": bestMatch.category,
+        "x-local-score": String(bestScore)
       },
-      body: JSON.stringify({
-        imageBase64: compressedBase64,
-        localResult: {
-          name: bestMatch.name,
-          turkish: bestMatch.turkish,
-          category: bestMatch.category,
-          score: bestScore
-        }
-      }),
+      body: selectedFile,
       signal: controller.signal
     });
 
@@ -192,34 +186,6 @@ function cosineSimilarity(a, b) {
     const normB = bf.norm();
     return dot.div(normA.mul(normB)).dataSync()[0];
   });
-}
-
-async function compressImageToBase64(file, maxSize = 1024, quality = 0.75) {
-  const img = await loadImageFromFile(file);
-
-  const canvas = document.createElement("canvas");
-  let width = img.width;
-  let height = img.height;
-
-  if (width > height) {
-    if (width > maxSize) {
-      height = Math.round((height * maxSize) / width);
-      width = maxSize;
-    }
-  } else {
-    if (height > maxSize) {
-      width = Math.round((width * maxSize) / height);
-      height = maxSize;
-    }
-  }
-
-  canvas.width = width;
-  canvas.height = height;
-
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(img, 0, 0, width, height);
-
-  return canvas.toDataURL("image/jpeg", quality);
 }
 
 init();
