@@ -24,10 +24,15 @@ analyzeBtn.addEventListener("click", async () => {
   }
 
   try {
-    result.textContent = "Analiz ediliyor...";
+    result.textContent = "1/4 Görsel okunuyor...";
 
     const uploadedImg = await loadImageFromFile(selectedFile);
+
+    result.textContent = "2/4 Görsel embedding hazırlanıyor...";
+
     const uploadedEmbedding = await getEmbedding(uploadedImg);
+
+    result.textContent = "3/4 Yerel veritabanı ile karşılaştırılıyor...";
 
     let bestMatch = null;
     let bestScore = -1;
@@ -41,7 +46,17 @@ analyzeBtn.addEventListener("click", async () => {
       }
     }
 
+    if (!bestMatch) {
+      result.textContent = "Hiç eşleşme bulunamadı.";
+      return;
+    }
+
     const base64 = await fileToBase64(selectedFile);
+
+    result.textContent = "4/4 İnternet destekli kontrol yapılıyor...";
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
 
     const apiResponse = await fetch("/api/identify", {
       method: "POST",
@@ -56,94 +71,134 @@ analyzeBtn.addEventListener("click", async () => {
           category: bestMatch.category,
           score: bestScore
         }
-      })
+      }),
+      signal: controller.signal
     });
 
+    clearTimeout(timeout);
+
     const apiData = await apiResponse.json();
+
+    if (!apiResponse.ok) {
+      result.textContent = `Sunucu hatası: ${apiData.error || "Bilinmeyen hata"}`;
+      return;
+    }
 
     if (apiData.source === "local") {
       result.textContent =
         `Bitki: ${apiData.data.name}\n` +
         `Türkçe: ${apiData.data.turkish}\n` +
+        `Kategori: ${apiData.data.category}\n` +
         `Benzerlik: %${(apiData.data.score * 100).toFixed(2)}\n` +
-        `Kaynak: Sistem`;
+        `Kaynak: Sistem veritabanı`;
+      return;
     }
 
     if (apiData.source === "plantnet") {
+      const commonNames =
+        apiData.data.commonNames && apiData.data.commonNames.length
+          ? apiData.data.commonNames.join(", ")
+          : "Yok";
+
       result.textContent =
         `Bitki: ${apiData.data.name}\n` +
         `Aile: ${apiData.data.family}\n` +
-        `Kaynak: PlantNet\n` +
-        `Güven: %${(apiData.data.score * 100).toFixed(2)}`;
+        `Yaygın adlar: ${commonNames}\n` +
+        `Güven: %${(apiData.data.score * 100).toFixed(2)}\n` +
+        `Kaynak: PlantNet`;
+      return;
     }
 
     if (apiData.source === "none") {
       result.textContent = "Bitki bulunamadı.";
+      return;
     }
 
+    result.textContent = "Sonuç alınamadı.";
   } catch (error) {
+    if (error.name === "AbortError") {
+      result.textContent = "İstek zaman aşımına uğradı. PlantNet cevabı geç kaldı.";
+      return;
+    }
+
     result.textContent = "Hata: " + error.message;
+    console.error(error);
   }
 });
 
 async function init() {
-  model = await mobilenet.load();
+  try {
+    result.textContent = "Model yükleniyor...";
 
-  const response = await fetch("/api/plants");
-  const data = await response.json();
+    model = await mobilenet.load();
 
-  plantsData = data.plants;
+    result.textContent = "Bitki verileri alınıyor...";
 
-  for (const plant of plantsData) {
-    for (const imgName of plant.images) {
-      const img = await loadImageFromUrl(`/images/${imgName}`);
-      const embedding = await getEmbedding(img);
+    const response = await fetch("/api/plants");
+    const data = await response.json();
+    plantsData = data.plants;
 
-      datasetEmbeddings.push({
-        name: plant.name,
-        turkish: plant.turkish,
-        category: plant.category,
-        embedding
-      });
+    result.textContent = "Referans görseller hazırlanıyor...";
+
+    for (const plant of plantsData) {
+      for (const imgName of plant.images) {
+        const img = await loadImageFromUrl(`/images/${imgName}`);
+        const embedding = await getEmbedding(img);
+
+        datasetEmbeddings.push({
+          name: plant.name,
+          turkish: plant.turkish,
+          category: plant.category,
+          embedding
+        });
+      }
     }
-  }
 
-  result.textContent = "Sistem hazır.";
+    result.textContent = "Sistem hazır.";
+  } catch (error) {
+    result.textContent = "Başlatma hatası: " + error.message;
+    console.error(error);
+  }
 }
 
 async function loadImageFromUrl(src) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("Görsel yüklenemedi: " + src));
     img.src = src;
   });
 }
 
 async function loadImageFromFile(file) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error("Yüklenen görsel okunamadı."));
     img.src = URL.createObjectURL(file);
   });
 }
 
 async function getEmbedding(img) {
-  return tf.tidy(() => model.infer(img, true));
+  return tf.tidy(() => model.infer(img, true).clone());
 }
 
 function cosineSimilarity(a, b) {
   return tf.tidy(() => {
-    const dot = a.mul(b).sum();
-    const normA = a.norm();
-    const normB = b.norm();
+    const af = a.flatten();
+    const bf = b.flatten();
+    const dot = af.mul(bf).sum();
+    const normA = af.norm();
+    const normB = bf.norm();
     return dot.div(normA.mul(normB)).dataSync()[0];
   });
 }
 
 async function fileToBase64(file) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("Dosya base64'e çevrilemedi."));
     reader.readAsDataURL(file);
   });
 }

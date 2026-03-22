@@ -14,7 +14,6 @@ module.exports = async (req, res) => {
 
     const { imageBase64, localResult } = req.body || {};
 
-    // Eğer local güçlü ise direkt döndür
     if (
       localResult &&
       typeof localResult.score === "number" &&
@@ -57,13 +56,19 @@ module.exports = async (req, res) => {
     formData.append("nb-results", "3");
     formData.append("lang", "tr");
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 25000);
+
     const response = await fetch(
       `https://my-api.plantnet.org/v2/identify/all?api-key=${apiKey}`,
       {
         method: "POST",
-        body: formData
+        body: formData,
+        signal: controller.signal
       }
     );
+
+    clearTimeout(timeout);
 
     const result = await response.json();
 
@@ -97,8 +102,13 @@ module.exports = async (req, res) => {
         score: best?.score || 0
       }
     });
-
   } catch (error) {
+    if (error.name === "AbortError") {
+      return res.status(504).json({
+        error: "PlantNet isteği zaman aşımına uğradı."
+      });
+    }
+
     return res.status(500).json({
       error: error.message
     });
