@@ -2,6 +2,7 @@ let model;
 let plantsData = [];
 let datasetEmbeddings = [];
 let currentMode = "deep";
+let systemReady = false;
 
 const inputs = [
   document.getElementById("imageInput1"),
@@ -30,6 +31,7 @@ const uploadModeText = document.getElementById("uploadModeText");
 const analyzeBtn = document.getElementById("analyzeBtn");
 const progressText = document.getElementById("progressText");
 const spinner = document.getElementById("spinner");
+const statusCard = document.getElementById("statusCard");
 const localResultBox = document.getElementById("localResult");
 const plantnetResultBox = document.getElementById("plantnetResult");
 
@@ -54,6 +56,11 @@ inputs.forEach((input, index) => {
 });
 
 analyzeBtn.addEventListener("click", async () => {
+  if (!systemReady) {
+    setError("Model yüklenmesi devam ediyor. Lütfen sistem hazır olana kadar bekle.");
+    return;
+  }
+
   const activeInputs =
     currentMode === "quick" ? [inputs[0]] : inputs;
 
@@ -143,7 +150,7 @@ analyzeBtn.addEventListener("click", async () => {
     renderLocalResult(data.local || mergedLocal);
     renderPlantnetResult(data.plantnet);
 
-    setLoading(false, "Analiz tamamlandı.");
+    setReadyState("Analiz tamamlandı.");
   } catch (error) {
     if (error.name === "AbortError") {
       setError("İstek zaman aşımına uğradı. Lütfen daha net veya daha küçük boyutlu görseller dene.");
@@ -157,6 +164,9 @@ analyzeBtn.addEventListener("click", async () => {
 async function init() {
   try {
     setMode("deep");
+    analyzeBtn.disabled = true;
+    systemReady = false;
+
     setLoading(true, "Model yükleniyor...");
 
     model = await mobilenet.load();
@@ -183,7 +193,9 @@ async function init() {
       }
     }
 
-    setLoading(false, "Sistem hazır. Tarama modunu seçip görselleri yükleyebilirsin.");
+    systemReady = true;
+    analyzeBtn.disabled = false;
+    setReadyState("Sistem hazır. Tarama modunu seçip görselleri yükleyebilirsin.");
   } catch (error) {
     setError("Başlatma hatası: " + error.message);
   }
@@ -337,10 +349,18 @@ function renderPlantnetResult(plantnet) {
 function setLoading(isLoading, text) {
   progressText.textContent = text;
   spinner.classList.toggle("active", isLoading);
+  statusCard.classList.toggle("loading-state", isLoading);
+}
+
+function setReadyState(text) {
+  progressText.textContent = text;
+  spinner.classList.remove("active");
+  statusCard.classList.remove("loading-state");
 }
 
 function setError(message) {
   spinner.classList.remove("active");
+  statusCard.classList.remove("loading-state");
   progressText.textContent = "Bir hata oluştu.";
   plantnetResultBox.innerHTML = `<div class="error-box">${escapeHtml(message)}</div>`;
 }

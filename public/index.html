@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bitki Tanıma Sistemi v2.1</title>
+  <title>Bitki Tanıma Sistemi v2.2</title>
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
   <div class="page">
     <header class="hero">
-      <div class="hero-badge">v2.1 Hibrit Tanıma</div>
+      <div class="hero-badge">v2.2 Hibrit Tanıma</div>
       <h1>🌿 Bitki Tanıma Sistemi</h1>
       <p class="hero-sub">
         Yerel veri tabanı + PlantNet destekli akıllı bitki tanıma sistemi
@@ -75,12 +75,12 @@
         </div>
 
         <div class="actions">
-          <button id="analyzeBtn" class="primary-btn">Bitkiyi Tanı</button>
+          <button id="analyzeBtn" class="primary-btn" disabled>Bitkiyi Tanı</button>
         </div>
 
-        <div class="status-card">
-          <div class="spinner" id="spinner"></div>
-          <div id="progressText">Sistem hazırlanıyor...</div>
+        <div class="status-card loading-state" id="statusCard">
+          <div class="spinner active" id="spinner"></div>
+          <div id="progressText" class="status-text pulse-text">Sistem hazırlanıyor...</div>
         </div>
       </section>
 
@@ -126,7 +126,57 @@
           </div>
         </div>
       </section>
+
+      <section class="card info-card">
+        <div class="card-header">
+          <h2>Kullanım Notu</h2>
+        </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <strong>Hızlı Tanıma:</strong>
+            Tek fotoğrafla kısa sürede ön değerlendirme almak için uygundur.
+          </div>
+          <div class="info-item">
+            <strong>Detaylı Tanıma:</strong>
+            Yaprak, genel görünüm ve çiçek/başak gibi birden fazla görselle daha güçlü sonuç verir.
+          </div>
+          <div class="info-item">
+            <strong>Yerel Sonuç:</strong>
+            Yüklenen bitkinin, sistemde kayıtlı örneklere en yakın eşleşmesini gösterir.
+          </div>
+          <div class="info-item">
+            <strong>İnternet Destekli Sonuç:</strong>
+            Yerel veriyle birlikte PlantNet verisini kullanarak alternatif adayları sunar.
+          </div>
+        </div>
+      </section>
+
+      <section class="card share-card">
+        <div class="card-header">
+          <h2>Paylaşım Açıklaması</h2>
+          <p>Bu sistemi tanıtmak için kullanılabilecek kısa açıklama</p>
+        </div>
+        <div class="share-box">
+          Bu sistem, bitki görsellerini önce yerel veri tabanında ardından internet destekli tanıma motorunda karşılaştırarak olası türleri sunar. Eğitim, arazi çalışması ve ön tanı amacıyla kullanılabilir.
+        </div>
+      </section>
     </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <h3>🌿 Bitki Tanıma Sistemi</h3>
+          <p>
+            Eğitim, ön tanı ve arazi destek amaçlı hibrit bitki tanıma platformu.
+          </p>
+        </div>
+
+        <div class="footer-note">
+          <strong>Önemli Not:</strong>
+          Sonuçlar yardımcı değerlendirme amaçlıdır. Düşük güvenli tahminlerde uzman kontrolü önerilir.
+        </div>
+      </div>
+    </footer>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
