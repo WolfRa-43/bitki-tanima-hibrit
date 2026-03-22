@@ -16,7 +16,6 @@ function parseMultipart(buffer, boundary) {
     const rawHeaders = part.slice(0, index);
     let rawBody = part.slice(index + 4);
 
-    // sondaki CRLF ve -- temizliği
     rawBody = rawBody.replace(/\r\n--$/, "");
     rawBody = rawBody.replace(/\r\n$/, "");
 
@@ -116,20 +115,21 @@ module.exports = async (req, res) => {
       image.filename || "plant.jpg"
     );
     plantForm.append("organs", "leaf");
-    plantForm.append("nb-results", "3");
-    plantForm.append("lang", "tr");
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 40000);
 
-    const response = await fetch(
-      `https://my-api.plantnet.org/v2/identify/all?api-key=${apiKey}`,
-      {
-        method: "POST",
-        body: plantForm,
-        signal: controller.signal
-      }
-    );
+    const url =
+      `https://my-api.plantnet.org/v2/identify/all` +
+      `?api-key=${encodeURIComponent(apiKey)}` +
+      `&nb-results=3` +
+      `&lang=tr`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      body: plantForm,
+      signal: controller.signal
+    });
 
     clearTimeout(timeout);
 
