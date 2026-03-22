@@ -3,114 +3,105 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bitki Tanıma Sistemi</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f7f2;
-      color: #1f1f1f;
-    }
-
-    .container {
-      max-width: 820px;
-      margin: 40px auto;
-      padding: 20px;
-    }
-
-    .card {
-      background: white;
-      border-radius: 18px;
-      padding: 24px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .upload-box {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    input[type="file"] {
-      padding: 12px;
-      border: 1px solid #d7e2d2;
-      border-radius: 12px;
-      background: #fafcf9;
-    }
-
-    button {
-      padding: 14px;
-      border: none;
-      border-radius: 12px;
-      background: #2f7d32;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #27692a;
-    }
-
-    #preview {
-      margin-top: 16px;
-      width: 100%;
-      max-height: 380px;
-      object-fit: contain;
-      border-radius: 12px;
-      display: none;
-      border: 1px solid #e0e0e0;
-      background: #fff;
-    }
-
-    #result {
-      margin-top: 20px;
-      padding: 18px;
-      border-radius: 14px;
-      background: #eef8ec;
-      border: 1px solid #d3e9cf;
-      white-space: pre-line;
-      min-height: 120px;
-    }
-
-    .small {
-      font-size: 14px;
-      color: #666;
-      margin-top: 10px;
-    }
-
-    .loading {
-      color: #2f7d32;
-      font-weight: bold;
-    }
-  </style>
+  <title>Bitki Tanıma Sistemi v2.0</title>
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-  <div class="container">
-    <div class="card">
+  <div class="page">
+    <header class="hero">
+      <div class="hero-badge">v2.0 Hibrit Tanıma</div>
       <h1>🌿 Bitki Tanıma Sistemi</h1>
+      <p class="hero-sub">
+        Yerel veri tabanı + PlantNet destekli akıllı bitki tanıma sistemi
+      </p>
+    </header>
 
-      <div class="upload-box">
-        <input type="file" id="imageInput" accept="image/*" />
-        <button id="analyzeBtn">Bitkiyi Tanı</button>
-      </div>
+    <main class="container">
+      <section class="card upload-card">
+        <div class="card-header">
+          <h2>Görsel Yükleme</h2>
+          <p>Birden fazla fotoğraf yüklemek doğruluğu ciddi şekilde artırır.</p>
+        </div>
 
-      <img id="preview" alt="Görsel önizleme" />
+        <div class="tips">
+          <div class="tip">Yaprağı yakın ve net çek</div>
+          <div class="tip">Genel görünümü ekle</div>
+          <div class="tip">Çiçek / başak / tohum da yükle</div>
+        </div>
 
-      <div id="result">Henüz analiz yapılmadı.</div>
-      <div class="small">
-        Sistem önce kendi veritabanındaki görsellerle karşılaştırma yapar, gerekirse internetten doğrular.
-      </div>
-    </div>
+        <div class="upload-grid">
+          <label class="upload-box">
+            <span>1. Yaprak / Yakın Plan</span>
+            <input type="file" id="imageInput1" accept="image/*" />
+            <img id="preview1" class="preview" alt="Önizleme 1" />
+          </label>
+
+          <label class="upload-box">
+            <span>2. Genel Görünüm</span>
+            <input type="file" id="imageInput2" accept="image/*" />
+            <img id="preview2" class="preview" alt="Önizleme 2" />
+          </label>
+
+          <label class="upload-box">
+            <span>3. Çiçek / Başak / Tohum</span>
+            <input type="file" id="imageInput3" accept="image/*" />
+            <img id="preview3" class="preview" alt="Önizleme 3" />
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="analyzeBtn" class="primary-btn">Bitkiyi Tanı</button>
+        </div>
+
+        <div class="status-card">
+          <div class="spinner" id="spinner"></div>
+          <div id="progressText">Sistem hazırlanıyor...</div>
+        </div>
+      </section>
+
+      <section class="results-grid">
+        <article class="card result-card">
+          <div class="card-header">
+            <h2>Yerel Veri Tabanı Sonucu</h2>
+            <p>Hocanın PDF verilerine göre bulunan en yakın eşleşme</p>
+          </div>
+          <div id="localResult" class="empty-state">Henüz analiz yapılmadı.</div>
+        </article>
+
+        <article class="card result-card">
+          <div class="card-header">
+            <h2>İnternet Destekli Sonuç</h2>
+            <p>PlantNet üzerinden bulunan en güçlü 3 aday</p>
+          </div>
+          <div id="plantnetResult" class="empty-state">Henüz analiz yapılmadı.</div>
+        </article>
+      </section>
+
+      <section class="card info-card">
+        <div class="card-header">
+          <h2>Nasıl Daha İyi Sonuç Alınır?</h2>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <strong>1.</strong>
+            Tek bitki odakta olsun.
+          </div>
+          <div class="info-item">
+            <strong>2.</strong>
+            Bulanık ve çok uzaktan çekimlerden kaçın.
+          </div>
+          <div class="info-item">
+            <strong>3.</strong>
+            Yaprak + genel görünüm + çiçek/başak en iyi kombinasyondur.
+          </div>
+          <div class="info-item">
+            <strong>4.</strong>
+            Güven düşükse sonucu tekrar kontrol et.
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>

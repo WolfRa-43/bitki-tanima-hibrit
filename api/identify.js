@@ -77,47 +77,58 @@ module.exports = async (req, res) => {
 
     const parsed = parseMultipart(buffer, boundary);
 
-    const image = parsed.files.image;
     const localName = parsed.fields.localName || "";
     const localTurkish = parsed.fields.localTurkish || "";
     const localCategory = parsed.fields.localCategory || "";
     const localScore = Number(parsed.fields.localScore || 0);
 
-    if (localScore >= 0.85) {
-      return res.status(200).json({
-        source: "local",
-        data: {
-          name: localName,
-          turkish: localTurkish,
-          category: localCategory,
-          score: localScore
-        }
-      });
+    let localData = null;
+    if (localName) {
+      localData = {
+        name: localName,
+        turkish: localTurkish,
+        category: localCategory,
+        score: localScore
+      };
     }
 
-    if (!image || !image.buffer || image.buffer.length === 0) {
-      return res.status(400).json({
-        error: "Görsel alınamadı."
-      });
-    }
+    const plantFiles = ["image1", "image2", "image3"]
+      .map((key) => parsed.files[key])
+      .filter(Boolean)
+      .filter((file) => file.buffer && file.buffer.length > 0);
 
-    const mimeType = image.contentType || "image/jpeg";
-    if (!["image/jpeg", "image/png", "image/jpg"].includes(mimeType)) {
+    if (plantFiles.length === 0) {
       return res.status(400).json({
-        error: "Sadece JPG veya PNG desteklenir."
+        error: "Hiç görsel alınamadı."
       });
     }
 
     const plantForm = new FormData();
-    plantForm.append(
-      "images",
-      new Blob([image.buffer], { type: mimeType }),
-      image.filename || "plant.jpg"
-    );
-    plantForm.append("organs", "leaf");
+
+    for (const file of plantFiles) {
+      const mimeType = file.contentType || "image/jpeg";
+
+      if (!["image/jpeg", "image/png", "image/jpg"].includes(mimeType)) {
+        continue;
+      }
+
+      plantForm.append(
+        "images",
+        new Blob([file.buffer], { type: mimeType }),
+        file.filename || "plant.jpg"
+      );
+    }
+
+    if (!plantForm.has("images")) {
+      return res.status(400).json({
+        error: "Desteklenmeyen görsel formatı."
+      });
+    }
+
+    plantForm.append("organs", "auto");
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 40000);
+    const timeout = setTimeout(() => controller.abort(), 45000);
 
     const url =
       `https://my-api.plantnet.org/v2/identify/all` +
@@ -142,27 +153,23 @@ module.exports = async (req, res) => {
       });
     }
 
-    if (!result.results || result.results.length === 0) {
-      return res.status(200).json({
-        source: "none",
-        message: "Bitki bulunamadı."
-      });
-    }
-
-    const best = result.results[0];
+    const candidates = (result.results || []).slice(0, 3).map((item) => ({
+      name:
+        item?.species?.scientificNameWithoutAuthor ||
+        item?.species?.scientificName ||
+        "Bilinmiyor",
+      family:
+        item?.species?.family?.scientificName ||
+        "Bilinmiyor",
+      commonNames: item?.species?.commonNames || [],
+      score: item?.score || 0
+    }));
 
     return res.status(200).json({
-      source: "plantnet",
-      data: {
-        name:
-          best?.species?.scientificNameWithoutAuthor ||
-          result.bestMatch ||
-          "Bilinmiyor",
-        family:
-          best?.species?.family?.scientificName ||
-          "Bilinmiyor",
-        commonNames: best?.species?.commonNames || [],
-        score: best?.score || 0
+      local: localData,
+      plantnet: {
+        bestMatch: candidates[0] || null,
+        candidates
       }
     });
   } catch (error) {
