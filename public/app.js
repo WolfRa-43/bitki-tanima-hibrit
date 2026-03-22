@@ -46,33 +46,71 @@ analyzeBtn.addEventListener("click", async () => {
       }
     }
 
-    const percentScore = (bestScore * 100).toFixed(2);
-
     if (!bestMatch) {
       result.textContent = "Hiç eşleşme bulunamadı.";
       return;
     }
 
-    let note = "";
-    let source = "Sistem veritabanı";
+    const base64 = await fileToBase64(selectedFile);
 
-    if (bestScore >= 0.92) {
-      note = "Bu bitki sistem içerisindeki bitki ile güçlü şekilde uyuşuyor.";
-    } else if (bestScore >= 0.82) {
-      note = "Bu bitki sistem veritabanında bulundu, ancak benzer türlerle karışma ihtimali olabilir.";
-    } else {
-      note = "Eşleşme zayıf. Bir sonraki adımda internet destekli kontrol eklenecek.";
-      source = "Sistem veritabanı (düşük güven)";
+    const localResult = {
+      name: bestMatch.name,
+      turkish: bestMatch.turkish,
+      category: bestMatch.category,
+      score: bestScore
+    };
+
+    const apiResponse = await fetch("/api/identify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        imageBase64: base64,
+        localResult
+      })
+    });
+
+    const apiData = await apiResponse.json();
+
+    if (!apiResponse.ok) {
+      result.textContent = `Hata: ${apiData.error || "Bilinmeyen hata"}`;
+      return;
     }
 
-    result.textContent =
-      `Bitki Adı: ${bestMatch.name}\n` +
-      `Türkçe Adı: ${bestMatch.turkish}\n` +
-      `Kategori: ${bestMatch.category}\n` +
-      `Kaynak: ${source}\n` +
-      `Benzerlik: %${percentScore}\n` +
-      `Not: ${note}`;
+    if (apiData.source === "local") {
+      result.textContent =
+        `Bitki Adı: ${apiData.data.name}\n` +
+        `Türkçe Adı: ${apiData.data.turkish}\n` +
+        `Kategori: ${apiData.data.category}\n` +
+        `Kaynak: Sistem veritabanı\n` +
+        `Benzerlik: %${(apiData.data.score * 100).toFixed(2)}\n` +
+        `Not: Bu bitki sistem içerisindeki kayıtlarla uyuşuyor.`;
+      return;
+    }
 
+    if (apiData.source === "plantnet") {
+      const common =
+        apiData.data.commonNames && apiData.data.commonNames.length
+          ? apiData.data.commonNames.join(", ")
+          : "Yok";
+
+      result.textContent =
+        `Bitki Adı: ${apiData.data.name}\n` +
+        `Aile: ${apiData.data.family}\n` +
+        `Yaygın Adlar: ${common}\n` +
+        `Kaynak: İnternet destekli tanıma (Pl@ntNet)\n` +
+        `Güven: %${(apiData.data.score * 100).toFixed(2)}\n` +
+        `Not: Yerel veritabanında güçlü eşleşme bulunamadı, sonuç internetten doğrulandı.`;
+      return;
+    }
+
+    if (apiData.source === "none") {
+      result.textContent = "Bitki bulunamadı.";
+      return;
+    }
+
+    result.textContent = "Sonuç alınamadı.";
   } catch (error) {
     result.textContent = "Bir hata oluştu: " + error.message;
     console.error(error);
@@ -84,7 +122,8 @@ async function init() {
     result.innerHTML = "<span class='loading'>Model yükleniyor...</span>";
 
     model = await mobilenet.load({ version: 2, alpha: 1.0 });
-    const response = await fetch("/api/identify");
+
+    const response = await fetch("/api/plants");
     const data = await response.json();
 
     plantsData = data.plants;
@@ -144,13 +183,20 @@ function cosineSimilarity(tensorA, tensorB) {
   return tf.tidy(() => {
     const a = tensorA.flatten();
     const b = tensorB.flatten();
-
     const dot = a.mul(b).sum();
     const normA = a.norm();
     const normB = b.norm();
     const similarity = dot.div(normA.mul(normB));
-
     return similarity.dataSync()[0];
+  });
+}
+
+async function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("Dosya base64'e çevrilemedi."));
+    reader.readAsDataURL(file);
   });
 }
 
