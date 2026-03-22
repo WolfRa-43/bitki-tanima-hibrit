@@ -14,6 +14,7 @@ module.exports = async (req, res) => {
 
     const { imageBase64, localResult } = req.body || {};
 
+    // Eğer local güçlü ise direkt döndür
     if (
       localResult &&
       typeof localResult.score === "number" &&
@@ -35,7 +36,7 @@ module.exports = async (req, res) => {
 
     if (!match) {
       return res.status(400).json({
-        error: "Geçersiz base64 görsel formatı."
+        error: "Geçersiz base64 formatı."
       });
     }
 
@@ -51,9 +52,8 @@ module.exports = async (req, res) => {
     const buffer = Buffer.from(base64Data, "base64");
 
     const formData = new FormData();
-    formData.append("images", new Blob([buffer], { type: mimeType }), "plant-image.jpg");
+    formData.append("images", new Blob([buffer], { type: mimeType }), "plant.jpg");
     formData.append("organs", "auto");
-    formData.append("include-related-images", "true");
     formData.append("nb-results", "3");
     formData.append("lang", "tr");
 
@@ -69,7 +69,7 @@ module.exports = async (req, res) => {
 
     if (!response.ok) {
       return res.status(response.status).json({
-        error: result?.message || "Pl@ntNet isteği başarısız oldu.",
+        error: result?.message || "PlantNet hata verdi",
         details: result
       });
     }
@@ -91,19 +91,16 @@ module.exports = async (req, res) => {
           result.bestMatch ||
           "Bilinmiyor",
         family:
-          best?.species?.family?.scientificNameWithoutAuthor ||
           best?.species?.family?.scientificName ||
           "Bilinmiyor",
         commonNames: best?.species?.commonNames || [],
-        score: best?.score || 0,
-        bestMatch: result.bestMatch || null,
-        remainingIdentificationRequests:
-          result.remainingIdentificationRequests ?? null
+        score: best?.score || 0
       }
     });
+
   } catch (error) {
     return res.status(500).json({
-      error: error.message || "Sunucu hatası."
+      error: error.message
     });
   }
 };
