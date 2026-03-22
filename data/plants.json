@@ -1,0 +1,395 @@
+{
+  "plants": [
+    {
+      "name": "Abutilon theophrasti",
+      "turkish": "İmam Pamuğu",
+      "category": "Yazlık",
+      "images": [
+        "abutlion-theophrasti-1.jpg",
+        "abutlion-theophrasti-2.jpg",
+        "abutlion-theophrasti-3.jpg"
+      ]
+    },
+    {
+      "name": "Alhagi pseudalhagi",
+      "turkish": "Deve Dikeni",
+      "category": "Çok Yıllık",
+      "images": [
+        "alhagi-pseudalhagi-1.jpg",
+        "alhagi-pseudalhagi-2.jpg"
+      ]
+    },
+    {
+      "name": "Alopecurus myosuroides",
+      "turkish": "Tilki Kuyruğu",
+      "category": "Kışlık",
+      "images": [
+        "alopecurus-myosuroides-1.jpg",
+        "alopecurus-myosuroides-2.jpg",
+        "alopecurus-myosuroides-3.jpg"
+      ]
+    },
+    {
+      "name": "Amaranthus spp.",
+      "turkish": "Horoz İbiği Türleri",
+      "category": "Yazlık",
+      "images": [
+        "amaranthus-spp-1.jpg",
+        "amaranthus-spp-2.jpg",
+        "amaranthus-spp-3.jpg",
+        "amaranthus-spp-4.jpg",
+        "amaranthus-spp-5.jpg",
+        "amaranthus-spp-6.jpg",
+        "amaranthus-spp-7.jpg"
+      ]
+    },
+    {
+      "name": "Amaranthus retroflexus",
+      "turkish": "Horoz İbiği",
+      "category": "Yazlık",
+      "images": [
+        "amaranthus-retroflexus-1.jpg"
+      ]
+    },
+    {
+      "name": "Amaranthus viridis",
+      "turkish": "Horoz İbiği",
+      "category": "Yazlık",
+      "images": [
+        "amaranthus-viridis-1.jpg"
+      ]
+    },
+    {
+      "name": "Avena fatua",
+      "turkish": "Yabani Yulaf",
+      "category": "Kışlık",
+      "images": [
+        "avena-fatua-1.jpg",
+        "avena-fatua-2.jpg",
+        "avena-fatua-3.jpg"
+      ]
+    },
+    {
+      "name": "Bromus tectorum",
+      "turkish": "Brom",
+      "category": "Kışlık",
+      "images": [
+        "bromus-tectorum-1.jpg",
+        "bromus-tectorum-2.jpg"
+      ]
+    },
+    {
+      "name": "Capsella bursa-pastoris",
+      "turkish": "Çoban Çantası",
+      "category": "Kışlık",
+      "images": [
+        "capsella-bursa-pastoris-1.jpg",
+        "capsella-bursa-pastoris-2.jpg",
+        "capsella-bursa-pastoris-3.jpg"
+      ]
+    },
+    {
+      "name": "Chenopodium album",
+      "turkish": "Sirken",
+      "category": "Yazlık",
+      "images": [
+        "chenopodium-album-1.jpg",
+        "chenopodium-album-2.jpg"
+      ]
+    },
+    {
+      "name": "Chrozophora tinctoria",
+      "turkish": "Bambul Otu",
+      "category": "Yazlık",
+      "images": [
+        "chrozophora-tinctoria-1.jpg",
+        "chrozophora-tinctoria-2.jpg"
+      ]
+    },
+    {
+      "name": "Cirsium arvense",
+      "turkish": "Köygöçüren",
+      "category": "Çok Yıllık",
+      "images": [
+        "cirsium-arvense-1.jpg",
+        "cirsium-arvense-2.jpg",
+        "cirsium-arvense-3.jpg"
+      ]
+    },
+    {
+      "name": "Convolvulus arvensis",
+      "turkish": "Tarla Sarmaşığı",
+      "category": "Çok Yıllık",
+      "images": [
+        "convolvulus-arvensis-1.jpg",
+        "convolvulus-arvensis-2.jpg"
+      ]
+    },
+    {
+      "name": "Conyza canadensis",
+      "turkish": "Şifa Otu",
+      "category": "Yazlık",
+      "images": [
+        "conyza-canadensis-1.jpg",
+        "conyza-canadensis-2.jpg",
+        "conyza-canadensis-3.jpg"
+      ]
+    },
+    {
+      "name": "Cynodon dactylon",
+      "turkish": "Köpek Dişi Ayrığı",
+      "category": "Çok Yıllık",
+      "images": [
+        "cynodon-dactylon-1.jpg",
+        "cynodon-dactylon-2.jpg",
+        "cynodon-dactylon-3.jpg"
+      ]
+    },
+    {
+      "name": "Cyperus rotundus",
+      "turkish": "Topalak",
+      "category": "Çok Yıllık",
+      "images": [
+        "cyperus-rotundus-1.jpg",
+        "cyperus-rotundus-2.jpg"
+      ]
+    },
+    {
+      "name": "Datura stramonium",
+      "turkish": "Şeytan Elması",
+      "category": "Yazlık",
+      "images": [
+        "datura-stramonium-1.jpg",
+        "datura-stramonium-2.jpg"
+      ]
+    },
+    {
+      "name": "Digitaria sanguinalis",
+      "turkish": "Çatal Otu",
+      "category": "Yazlık",
+      "images": [
+        "digitaria-sanguinalis-1.jpg",
+        "digitaria-sanguinalis-2.jpg",
+        "digitaria-sanguinalis-3.jpg",
+        "digitaria-sanguinalis-4.jpg"
+      ]
+    },
+    {
+      "name": "Echinochloa spp.",
+      "turkish": "Darıcan Türleri",
+      "category": "Yazlık",
+      "images": [
+        "echinochloa-spp-1.jpg",
+        "echinochloa-spp-2.jpg"
+      ]
+    },
+    {
+      "name": "Fumaria officinalis",
+      "turkish": "Şahtere",
+      "category": "Kışlık",
+      "images": [
+        "fumaria-officinalis-1.jpg",
+        "fumaria-officinalis-2.jpg"
+      ]
+    },
+    {
+      "name": "Galium aparine",
+      "turkish": "Dilkanatan",
+      "category": "Kışlık",
+      "images": [
+        "galium-aparine-1.jpg",
+        "galium-aparine-2.jpg",
+        "galium-aparine-3.jpg"
+      ]
+    },
+    {
+      "name": "Heliotropium europaeum",
+      "turkish": "Bozot",
+      "category": "Yazlık",
+      "images": [
+        "heliotropium-europaeum-1.jpg",
+        "heliotropium-europaeum-2.jpg",
+        "heliotropium-europaeum-3.jpg"
+      ]
+    },
+    {
+      "name": "Hibiscus trionum",
+      "turkish": "Yabani Bamya",
+      "category": "Yazlık",
+      "images": [
+        "hibiscus-trionum-1.jpg",
+        "hibiscus-trionum-2.jpg"
+      ]
+    },
+    {
+      "name": "Lolium perenne",
+      "turkish": "İngiliz Çimi",
+      "category": "Çok Yıllık",
+      "images": [
+        "lolium-perenne-1.jpg",
+        "lolium-perenne-2.jpg",
+        "lolium-perenne-3.jpg"
+      ]
+    },
+    {
+      "name": "Lolium rigidum",
+      "turkish": "İnce Delice",
+      "category": "Kışlık",
+      "images": [
+        "lolium-rigidum-1.jpg",
+        "lolium-rigidum-2.jpg",
+        "lolium-rigidum-3.jpg"
+      ]
+    },
+    {
+      "name": "Matricaria chamomilla",
+      "turkish": "Hakiki Papatya",
+      "category": "Kışlık",
+      "images": [
+        "matricaria-chamomilla-1.jpg",
+        "matricaria-chamomilla-2.jpg"
+      ]
+    },
+    {
+      "name": "Papaver rhoeas",
+      "turkish": "Gelincik",
+      "category": "Kışlık",
+      "images": [
+        "papaver-rhoeas-1.jpg",
+        "papaver-rhoeas-2.jpg"
+      ]
+    },
+    {
+      "name": "Paspalum paspaloides",
+      "turkish": "Su Ayrığı",
+      "category": "Çok Yıllık",
+      "images": [
+        "paspalum-paspaloides-1.jpg",
+        "paspalum-paspaloides-2.jpg",
+        "paspalum-paspaloides-3.jpg"
+      ]
+    },
+    {
+      "name": "Phalaris canariensis",
+      "turkish": "Kuşyemi",
+      "category": "Kışlık",
+      "images": [
+        "phalaris-canariensis-1.jpg",
+        "phalaris-canariensis-2.jpg"
+      ]
+    },
+    {
+      "name": "Phragmites australis",
+      "turkish": "Kamış",
+      "category": "Çok Yıllık",
+      "images": [
+        "phragmites-australis-1.jpg",
+        "phragmites-australis-2.jpg",
+        "phragmites-australis-3.jpg"
+      ]
+    },
+    {
+      "name": "Physalis angulata",
+      "turkish": "Fener Otu",
+      "category": "Yazlık",
+      "images": [
+        "physalis-angulata-1.jpg",
+        "physalis-angulata-2.jpg"
+      ]
+    },
+    {
+      "name": "Portulaca oleracea",
+      "turkish": "Semiz Otu",
+      "category": "Yazlık",
+      "images": [
+        "portulaca-oleracea-1.jpg",
+        "portulaca-oleracea-2.jpg",
+        "portulaca-oleracea-3.jpg"
+      ]
+    },
+    {
+      "name": "Raphanus raphanistrum",
+      "turkish": "Yabani Turp",
+      "category": "Kışlık",
+      "images": [
+        "raphanus-raphanistrum-1.jpg",
+        "raphanus-raphanistrum-2.jpg"
+      ]
+    },
+    {
+      "name": "Setaria spp.",
+      "turkish": "Kirpi Darı",
+      "category": "Yazlık",
+      "images": [
+        "setaria-spp-1.jpg",
+        "setaria-spp-2.jpg",
+        "setaria-spp-3.jpg"
+      ]
+    },
+    {
+      "name": "Silybum marianum",
+      "turkish": "Kangal",
+      "category": "Kışlık",
+      "images": [
+        "silybum-marianum-1.jpg",
+        "silybum-marianum-2.jpg"
+      ]
+    },
+    {
+      "name": "Sinapis arvensis",
+      "turkish": "Yabani Hardal",
+      "category": "Kışlık",
+      "images": [
+        "sinapis-arvensis-1.jpg",
+        "sinapis-arvensis-2.jpg"
+      ]
+    },
+    {
+      "name": "Solanum nigrum",
+      "turkish": "Köpek Üzümü",
+      "category": "Yazlık",
+      "images": [
+        "solanum-nigrum-1.jpg",
+        "solanum-nigrum-2.jpg"
+      ]
+    },
+    {
+      "name": "Sorghum halepense",
+      "turkish": "Kanyaş",
+      "category": "Çok Yıllık",
+      "images": [
+        "sorghum-halepense-1.jpg",
+        "sorghum-halepense-2.jpg",
+        "sorghum-halepense-3.jpg"
+      ]
+    },
+    {
+      "name": "Tribulus terrestris",
+      "turkish": "Demir Dikeni",
+      "category": "Yazlık",
+      "images": [
+        "tribulus-terrestris-1.jpg",
+        "tribulus-terrestris-2.jpg"
+      ]
+    },
+    {
+      "name": "Vicia sativa",
+      "turkish": "Yabani Fiğ",
+      "category": "Kışlık",
+      "images": [
+        "vicia-sativa-1.jpg",
+        "vicia-sativa-2.jpg"
+      ]
+    },
+    {
+      "name": "Xanthium strumarium",
+      "turkish": "Domuz Pıtrağı",
+      "category": "Yazlık",
+      "images": [
+        "xanthium-strumarium-1.jpg",
+        "xanthium-strumarium-2.jpg",
+        "xanthium-strumarium-3.jpg"
+      ]
+    }
+  ]
+}
