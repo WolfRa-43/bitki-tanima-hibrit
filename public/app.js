@@ -53,19 +53,19 @@ analyzeBtn.addEventListener("click", async () => {
 
     result.textContent = "4/4 İnternet destekli kontrol yapılıyor...";
 
+    const formData = new FormData();
+    formData.append("image", selectedFile);
+    formData.append("localName", bestMatch.name || "");
+    formData.append("localTurkish", bestMatch.turkish || "");
+    formData.append("localCategory", bestMatch.category || "");
+    formData.append("localScore", String(bestScore));
+
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 45000);
 
     const apiResponse = await fetch("/api/identify", {
       method: "POST",
-      headers: {
-        "Content-Type": selectedFile.type || "image/jpeg",
-        "x-local-name": bestMatch.name,
-        "x-local-turkish": bestMatch.turkish,
-        "x-local-category": bestMatch.category,
-        "x-local-score": String(bestScore)
-      },
-      body: selectedFile,
+      body: formData,
       signal: controller.signal
     });
 

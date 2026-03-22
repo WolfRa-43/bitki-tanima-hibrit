@@ -11,12 +11,26 @@ module.exports = async (req, res) => {
       });
     }
 
-    const localName = req.headers["x-local-name"] || "";
-    const localTurkish = req.headers["x-local-turkish"] || "";
-    const localCategory = req.headers["x-local-category"] || "";
-    const localScore = Number(req.headers["x-local-score"] || 0);
+    const contentType = req.headers["content-type"] || "";
 
-    // Local eşleşme yeterince güçlüyse direkt dön
+    if (!contentType.includes("multipart/form-data")) {
+      return res.status(400).json({
+        error: "Beklenen veri tipi multipart/form-data"
+      });
+    }
+
+    // Basit multipart parser yerine Vercel Node ortamında gelen body'yi ham okuyamayız diye
+    // kullanıcı tarafında local skor yüksekse direkt local döndürmek daha pratik olurdu.
+    // Ama burada multipart ayrıştırma için req.formData() kullanıyoruz.
+
+    const formData = await req.formData();
+
+    const image = formData.get("image");
+    const localName = formData.get("localName") || "";
+    const localTurkish = formData.get("localTurkish") || "";
+    const localCategory = formData.get("localCategory") || "";
+    const localScore = Number(formData.get("localScore") || 0);
+
     if (localScore >= 0.85) {
       return res.status(200).json({
         source: "local",
@@ -29,20 +43,13 @@ module.exports = async (req, res) => {
       });
     }
 
-    // Binary body oku
-    const chunks = [];
-    for await (const chunk of req) {
-      chunks.push(chunk);
-    }
-    const buffer = Buffer.concat(chunks);
-
-    if (!buffer || buffer.length === 0) {
+    if (!image) {
       return res.status(400).json({
-        error: "Dosya verisi alınamadı."
+        error: "Görsel alınamadı."
       });
     }
 
-    const mimeType = req.headers["content-type"] || "image/jpeg";
+    const mimeType = image.type || "image/jpeg";
 
     if (!["image/jpeg", "image/png", "image/jpg"].includes(mimeType)) {
       return res.status(400).json({
@@ -50,11 +57,14 @@ module.exports = async (req, res) => {
       });
     }
 
-    const formData = new FormData();
-    formData.append("images", new Blob([buffer], { type: mimeType }), "plant.jpg");
-    formData.append("organs", "leaf");
-    formData.append("nb-results", "3");
-    formData.append("lang", "tr");
+    const arrayBuffer = await image.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const plantForm = new FormData();
+    plantForm.append("images", new Blob([buffer], { type: mimeType }), "plant.jpg");
+    plantForm.append("organs", "leaf");
+    plantForm.append("nb-results", "3");
+    plantForm.append("lang", "tr");
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 40000);
@@ -63,7 +73,7 @@ module.exports = async (req, res) => {
       `https://my-api.plantnet.org/v2/identify/all?api-key=${apiKey}`,
       {
         method: "POST",
-        body: formData,
+        body: plantForm,
         signal: controller.signal
       }
     );
