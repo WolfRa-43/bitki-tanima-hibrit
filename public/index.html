@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bitki Tanıma Sistemi v2.0</title>
+  <title>Bitki Tanıma Sistemi v2.1</title>
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
   <div class="page">
     <header class="hero">
-      <div class="hero-badge">v2.0 Hibrit Tanıma</div>
+      <div class="hero-badge">v2.1 Hibrit Tanıma</div>
       <h1>🌿 Bitki Tanıma Sistemi</h1>
       <p class="hero-sub">
         Yerel veri tabanı + PlantNet destekli akıllı bitki tanıma sistemi
@@ -17,10 +17,35 @@
     </header>
 
     <main class="container">
-      <section class="card upload-card">
+      <section class="card mode-card">
+        <div class="card-header centered">
+          <h2>Tarama Modunu Seç</h2>
+          <p>İstersen tek fotoğrafla hızlıca tanı, istersen çoklu görselle daha güçlü analiz yap.</p>
+        </div>
+
+        <div class="mode-grid">
+          <button class="mode-option" id="quickModeBtn" type="button">
+            <div class="mode-icon">⚡</div>
+            <div class="mode-title">Hızlı Tanıma</div>
+            <div class="mode-desc">
+              Tek fotoğrafla pratik ve hızlı bitki tespiti
+            </div>
+          </button>
+
+          <button class="mode-option featured" id="deepModeBtn" type="button">
+            <div class="mode-icon">🔬</div>
+            <div class="mode-title">Detaylı Tanıma</div>
+            <div class="mode-desc">
+              3 farklı görselle daha güçlü ve daha güvenilir analiz
+            </div>
+          </button>
+        </div>
+      </section>
+
+      <section class="card upload-card" id="uploadSection">
         <div class="card-header">
           <h2>Görsel Yükleme</h2>
-          <p>Birden fazla fotoğraf yüklemek doğruluğu ciddi şekilde artırır.</p>
+          <p id="uploadModeText">Birden fazla fotoğraf yüklemek doğruluğu ciddi şekilde artırır.</p>
         </div>
 
         <div class="tips">
@@ -29,20 +54,20 @@
           <div class="tip">Çiçek / başak / tohum da yükle</div>
         </div>
 
-        <div class="upload-grid">
-          <label class="upload-box">
+        <div class="upload-grid" id="uploadGrid">
+          <label class="upload-box" id="box1">
             <span>1. Yaprak / Yakın Plan</span>
             <input type="file" id="imageInput1" accept="image/*" />
             <img id="preview1" class="preview" alt="Önizleme 1" />
           </label>
 
-          <label class="upload-box">
+          <label class="upload-box" id="box2">
             <span>2. Genel Görünüm</span>
             <input type="file" id="imageInput2" accept="image/*" />
             <img id="preview2" class="preview" alt="Önizleme 2" />
           </label>
 
-          <label class="upload-box">
+          <label class="upload-box" id="box3">
             <span>3. Çiçek / Başak / Tohum</span>
             <input type="file" id="imageInput3" accept="image/*" />
             <img id="preview3" class="preview" alt="Önizleme 3" />

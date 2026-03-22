@@ -1,6 +1,7 @@
 let model;
 let plantsData = [];
 let datasetEmbeddings = [];
+let currentMode = "deep";
 
 const inputs = [
   document.getElementById("imageInput1"),
@@ -14,11 +15,33 @@ const previews = [
   document.getElementById("preview3")
 ];
 
+const boxes = [
+  document.getElementById("box1"),
+  document.getElementById("box2"),
+  document.getElementById("box3")
+];
+
+const quickModeBtn = document.getElementById("quickModeBtn");
+const deepModeBtn = document.getElementById("deepModeBtn");
+const uploadSection = document.getElementById("uploadSection");
+const uploadGrid = document.getElementById("uploadGrid");
+const uploadModeText = document.getElementById("uploadModeText");
+
 const analyzeBtn = document.getElementById("analyzeBtn");
 const progressText = document.getElementById("progressText");
 const spinner = document.getElementById("spinner");
 const localResultBox = document.getElementById("localResult");
 const plantnetResultBox = document.getElementById("plantnetResult");
+
+quickModeBtn.addEventListener("click", () => {
+  setMode("quick");
+  scrollToUpload();
+});
+
+deepModeBtn.addEventListener("click", () => {
+  setMode("deep");
+  scrollToUpload();
+});
 
 inputs.forEach((input, index) => {
   input.addEventListener("change", (event) => {
@@ -31,7 +54,10 @@ inputs.forEach((input, index) => {
 });
 
 analyzeBtn.addEventListener("click", async () => {
-  const selectedFiles = inputs
+  const activeInputs =
+    currentMode === "quick" ? [inputs[0]] : inputs;
+
+  const selectedFiles = activeInputs
     .map((input) => input.files[0])
     .filter(Boolean);
 
@@ -79,9 +105,14 @@ analyzeBtn.addEventListener("click", async () => {
     setLoading(true, "3/5 İnternet destekli tanıma hazırlanıyor...");
 
     const formData = new FormData();
-    selectedFiles.forEach((file, index) => {
-      formData.append(`image${index + 1}`, file);
-    });
+
+    if (currentMode === "quick") {
+      if (selectedFiles[0]) formData.append("image1", selectedFiles[0]);
+    } else {
+      selectedFiles.forEach((file, index) => {
+        formData.append(`image${index + 1}`, file);
+      });
+    }
 
     formData.append("localName", mergedLocal.name || "");
     formData.append("localTurkish", mergedLocal.turkish || "");
@@ -125,6 +156,7 @@ analyzeBtn.addEventListener("click", async () => {
 
 async function init() {
   try {
+    setMode("deep");
     setLoading(true, "Model yükleniyor...");
 
     model = await mobilenet.load();
@@ -151,10 +183,35 @@ async function init() {
       }
     }
 
-    setLoading(false, "Sistem hazır. Görselleri yükleyebilirsin.");
+    setLoading(false, "Sistem hazır. Tarama modunu seçip görselleri yükleyebilirsin.");
   } catch (error) {
     setError("Başlatma hatası: " + error.message);
   }
+}
+
+function setMode(mode) {
+  currentMode = mode;
+
+  quickModeBtn.classList.toggle("active", mode === "quick");
+  deepModeBtn.classList.toggle("active", mode === "deep");
+
+  if (mode === "quick") {
+    uploadGrid.classList.add("quick-mode");
+    boxes[0].classList.remove("hidden");
+    boxes[1].classList.add("hidden");
+    boxes[2].classList.add("hidden");
+    uploadModeText.textContent = "Tek fotoğrafla hızlı ve pratik bitki tanımlama.";
+  } else {
+    uploadGrid.classList.remove("quick-mode");
+    boxes[0].classList.remove("hidden");
+    boxes[1].classList.remove("hidden");
+    boxes[2].classList.remove("hidden");
+    uploadModeText.textContent = "Birden fazla fotoğraf yüklemek doğruluğu ciddi şekilde artırır.";
+  }
+}
+
+function scrollToUpload() {
+  uploadSection.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function mergeLocalResults(results) {
