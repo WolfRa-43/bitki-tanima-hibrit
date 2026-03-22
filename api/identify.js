@@ -52,12 +52,12 @@ module.exports = async (req, res) => {
 
     const formData = new FormData();
     formData.append("images", new Blob([buffer], { type: mimeType }), "plant.jpg");
-    formData.append("organs", "auto");
+    formData.append("organs", "leaf");
     formData.append("nb-results", "3");
     formData.append("lang", "tr");
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 25000);
+    const timeout = setTimeout(() => controller.abort(), 40000);
 
     const response = await fetch(
       `https://my-api.plantnet.org/v2/identify/all?api-key=${apiKey}`,
