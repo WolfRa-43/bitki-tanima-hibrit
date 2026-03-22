@@ -1,3 +1,46 @@
+function parseMultipart(buffer, boundary) {
+  const boundaryText = "--" + boundary;
+  const parts = buffer.toString("binary").split(boundaryText);
+
+  const result = {
+    fields: {},
+    files: {}
+  };
+
+  for (let part of parts) {
+    if (!part || part === "--\r\n" || part === "--") continue;
+
+    const index = part.indexOf("\r\n\r\n");
+    if (index === -1) continue;
+
+    const rawHeaders = part.slice(0, index);
+    let rawBody = part.slice(index + 4);
+
+    // sondaki CRLF ve -- temizliği
+    rawBody = rawBody.replace(/\r\n--$/, "");
+    rawBody = rawBody.replace(/\r\n$/, "");
+
+    const dispositionMatch = rawHeaders.match(/name="([^"]+)"/);
+    if (!dispositionMatch) continue;
+
+    const fieldName = dispositionMatch[1];
+    const filenameMatch = rawHeaders.match(/filename="([^"]*)"/);
+    const contentTypeMatch = rawHeaders.match(/Content-Type:\s*([^\r\n]+)/i);
+
+    if (filenameMatch) {
+      result.files[fieldName] = {
+        filename: filenameMatch[1],
+        contentType: contentTypeMatch ? contentTypeMatch[1].trim() : "application/octet-stream",
+        buffer: Buffer.from(rawBody, "binary")
+      };
+    } else {
+      result.fields[fieldName] = rawBody;
+    }
+  }
+
+  return result;
+}
+
 module.exports = async (req, res) => {
   try {
     if (req.method !== "POST") {
@@ -12,24 +55,34 @@ module.exports = async (req, res) => {
     }
 
     const contentType = req.headers["content-type"] || "";
-
     if (!contentType.includes("multipart/form-data")) {
       return res.status(400).json({
         error: "Beklenen veri tipi multipart/form-data"
       });
     }
 
-    // Basit multipart parser yerine Vercel Node ortamında gelen body'yi ham okuyamayız diye
-    // kullanıcı tarafında local skor yüksekse direkt local döndürmek daha pratik olurdu.
-    // Ama burada multipart ayrıştırma için req.formData() kullanıyoruz.
+    const boundaryMatch = contentType.match(/boundary=(.+)$/);
+    if (!boundaryMatch) {
+      return res.status(400).json({
+        error: "Multipart boundary bulunamadı."
+      });
+    }
 
-    const formData = await req.formData();
+    const boundary = boundaryMatch[1];
 
-    const image = formData.get("image");
-    const localName = formData.get("localName") || "";
-    const localTurkish = formData.get("localTurkish") || "";
-    const localCategory = formData.get("localCategory") || "";
-    const localScore = Number(formData.get("localScore") || 0);
+    const chunks = [];
+    for await (const chunk of req) {
+      chunks.push(chunk);
+    }
+    const buffer = Buffer.concat(chunks);
+
+    const parsed = parseMultipart(buffer, boundary);
+
+    const image = parsed.files.image;
+    const localName = parsed.fields.localName || "";
+    const localTurkish = parsed.fields.localTurkish || "";
+    const localCategory = parsed.fields.localCategory || "";
+    const localScore = Number(parsed.fields.localScore || 0);
 
     if (localScore >= 0.85) {
       return res.status(200).json({
@@ -43,25 +96,25 @@ module.exports = async (req, res) => {
       });
     }
 
-    if (!image) {
+    if (!image || !image.buffer || image.buffer.length === 0) {
       return res.status(400).json({
         error: "Görsel alınamadı."
       });
     }
 
-    const mimeType = image.type || "image/jpeg";
-
+    const mimeType = image.contentType || "image/jpeg";
     if (!["image/jpeg", "image/png", "image/jpg"].includes(mimeType)) {
       return res.status(400).json({
         error: "Sadece JPG veya PNG desteklenir."
       });
     }
 
-    const arrayBuffer = await image.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
     const plantForm = new FormData();
-    plantForm.append("images", new Blob([buffer], { type: mimeType }), "plant.jpg");
+    plantForm.append(
+      "images",
+      new Blob([image.buffer], { type: mimeType }),
+      image.filename || "plant.jpg"
+    );
     plantForm.append("organs", "leaf");
     plantForm.append("nb-results", "3");
     plantForm.append("lang", "tr");
